@@ -112,7 +112,7 @@
       <div id="modal1" class="modal">
         <div class="modal-content" style="min-height: 350px;">
           <p><strong>Change Coin</strong></p>
-          
+
           <div class="row">
             <div class="col s12">
               <div class="row">
@@ -254,7 +254,7 @@
                         onAutocomplete: function(val) {
                           // Callback function when value is autcompleted.
                         },
-                        minLength: 1, // The minimum length of the input for the autocomplete to start. Default: 1.
+                        minLength: 2, // The minimum length of the input for the autocomplete to start. Default: 1.
                       });
 
                     //$('#myCoin_sel').material_select();
@@ -429,7 +429,13 @@
               } 
             });
 
+            window.setInterval(function(){
+                getCurrentPrice();
+                //drawLineChart();
+            }, 30000);
+
         });
+        
 
         
   </script>
