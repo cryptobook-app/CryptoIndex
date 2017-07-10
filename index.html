@@ -53,16 +53,19 @@
           <div class="card ">
             <div class="card-content ">
               
-              <p><small>Current Price (<span id="coinPrefix_lbl"></span>)</small></p>
-              <h5 id="currentPrice_lbl"></h5>
+                <p><small>Current Price (<span id="coinPrefix_lbl"></span>)</small></p>
+                <h5 id="currentPrice_lbl"></h5>
 
+                <p class=""><small id="marketData_lbl" hidden>Checking for market data...</small></p>
             </div>
+            <!--
             <div class="card-action grey darken-2 white-text">
              
                 <a href="#modal1"><i class="material-icons">settings</i></a>
                 <a href="#"><i class="material-icons">alarm_on</i></a>
                 
             </div>
+            -->
           </div>
         </div>
       </div>
@@ -110,15 +113,19 @@
         <div class="modal-content" style="min-height: 350px;">
           <p><strong>Change Coin</strong></p>
           
-          <div class="input-field col s12">
-            <select id="myCoin_sel">
-              
-              <option value="BTC">Bitcoin</option>
-              
-              
-            </select>
-            <label>Please select a coin...</label>
+          <div class="row">
+            <div class="col s12">
+              <div class="row">
+                <div class="input-field col s12">
+                  <i class="material-icons prefix">textsms</i>
+                  <input type="text" id="autocomplete-input" class="autocomplete">
+                  <label for="autocomplete-input">Please select a coin</label>
+                </div>
+              </div>
+            </div>
           </div>
+
+
         </div>
         <div class="modal-footer">
           <a href="#!" class="modal-action modal-close waves-effect waves-orange btn-flat">Continue</a>
@@ -191,13 +198,30 @@
             function getCurrentPrice() {
                 var jsonData = $.ajax({
                   url: 'https://min-api.cryptocompare.com/data/price?fsym='+myCoin+'&tsyms=BTC,USD,AUD,EUR,NZD',
+                  //url: 'https://www.cryptocompare.com/api/data/coinsnapshot/?fsym='+myCoin+'&tsym=USD',
                   dataType: 'json',
                 }).done(function (results) {
+                    //console.log(results);
+                    $('#marketData_lbl').show();
                     $('#currentPrice_lbl').html('$' + results[myCurrency].toFixed(4) + ' <small>'+myCurrency+'</small>');
                     var ThisNewNumbert = results[myCurrency] * $('#currentHoldings_lbl').text();
                     
                     $('#currentHoldingsFiat_lbl').text('$' + ThisNewNumbert.toFixed(2) + ' ' + myCurrency);
+                    
                 });
+
+                var jsonData1a = $.ajax({
+                  url: 'https://www.cryptocompare.com/api/data/coinsnapshot/?fsym='+myCoin+'&tsym=USD',
+                  dataType: 'json',
+                }).done(function (results2) {
+                    
+                    if (results2.Message == 'Coin snapshot succesfully returned'){
+                        $('#marketData_lbl').text("24Hr High: $" + parseFloat( results2.Data.Exchanges[0].HIGH24HOUR).toFixed(2) + "USD -  24Hr Low: $" + parseFloat( results2.Data.Exchanges[0].LOW24HOUR).toFixed(2) + "USD ("+results2.Data.Exchanges[0].MARKET+")" );
+                    } else {
+                        $('#marketData_lbl').html("<strong>ERROR: </strong>" + results2.Message + "!");
+                    }
+                });
+
 
                 $('#coinPrefix_lbl').text(myCoin);
             }
@@ -208,14 +232,32 @@
                   url: 'https://www.cryptocompare.com/api/data/coinlist',
                   dataType: 'json',
                 }).done(function (results) {
-                    
+                    var countryArray = results;
+                    var dataCountry = {};
+                    console.log(results);
+                    $('input.autocomplete').autocomplete({
+                      data: dataCountry,
+                      limit:5
+                      }); 
+
                     for(var propName in results['Data']) {
-                        
-                        $('#myCoin_sel').append('<option value="'+propName+'">'+results.Data[propName]['CoinName']+'</option>');
+                        //datac.push([propName, results.Data[propName]['CoinName']]);
+                        dataCountry[propName] = 'https://www.cryptocompare.com/' + results.Data[propName]['ImageUrl'];
+                        //$('#myCoin_sel').append('<option value="'+propName+'">'+results.Data[propName]['CoinName']+'</option>');
 
                     }
 
-                    $('#myCoin_sel').material_select();
+                    //alert(datac);
+                    $('#autocomplete-input').autocomplete({
+                        data: dataCountry,
+                        limit: 20, // The max amount of results that can be shown at once. Default: Infinity.
+                        onAutocomplete: function(val) {
+                          // Callback function when value is autcompleted.
+                        },
+                        minLength: 1, // The minimum length of the input for the autocomplete to start. Default: 1.
+                      });
+
+                    //$('#myCoin_sel').material_select();
 
                 });
             }
@@ -224,8 +266,6 @@
 
             function drawLineChart() {
 
-
-                // Add a helper to format timestamp data
                 Date.prototype.formatMMDDYYYY = function() {
                     return (this.getMonth() + 1) +
                     "/" +  this.getDate() +
@@ -329,6 +369,8 @@
               $(this).material_select();
             });
 
+            
+
             $('#modal1').modal({
               dismissible: true, // Modal can be dismissed by clicking outside of the modal
               opacity: .5, // Opacity of modal background
@@ -341,7 +383,7 @@
                 console.log(modal, trigger);
               },
               complete: function() { 
-                myCoin = $('#myCoin_sel').val();
+                myCoin = $('#autocomplete-input').val();
                 localStorage.setItem("currentCoin", myCoin);
                 
                 location.reload();
