@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CryptoIndex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+   <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/css/materialize.min.css">
+
+    <style type="text/css">
+      
+    </style>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="http://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.js"></script>
+      <script src="http://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <nav class="grey darken-3">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo right"><small>Crypto<span style="color: #ff9c18;">Index</span></small></a>
+        <ul id="slide-out" class="side-nav">
+          <li><div class="user-view">
+            <div class="background grey darken-4 " style="min-height: 20%;">
+             
+            </div>
+            <p>Crypto<span style="color: #ff9c18;">Index</span> for Android</p>
+            <h5><small>~0.0000000 BTC<br/><small>Total Balance</small></small></h5><br/>
+          </div></li>
+          <li><a href="#modal1"><i class="material-icons">search</i>Change Coin</a></li>
+          <li><a href="#mod_ChangeFiat"><i class="material-icons">language</i>Change Currency</a></li>
+          
+          <li><div class="divider"></div></li>
+          <li><a class="subheader">Transactions</a></li>
+          <li><a href="#mod_CreateTransaction"><i class="material-icons">add_box</i>Create Transaction</a></li>-->
+        </ul>
+        <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
+      </div>
+    </nav>
+   
+      <div class="row">
+        <div class="col s12 m12">
+          <div class="card ">
+            <div class="card-content ">
+              
+              <p><small>Current Price (<span id="coinPrefix_lbl"></span>)</small></p>
+              <h5 id="currentPrice_lbl"></h5>
+
+            </div>
+            <div class="card-action grey darken-2 white-text">
+             
+                <a href="#modal1"><i class="material-icons">settings</i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col s12 m12">
+          <div class="card ">
+            <div class="card-content  white-text">
+              <canvas id="myLineChart"></canvas>
+
+              
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col s12 m12">
+          <div class="card ">
+            <div class="card-content ">
+              
+              <p><small>Current Holdings</small></p>
+              <h5 id="currentHoldings_lbl">0.0000000</h5>
+              <small id="currentHoldingsFiat_lbl">$0.00</small>
+              
+            </div>
+            <div class="card-action grey darken-2 white-text">
+            
+                <a href="#mod_CreateTransaction"><i class="material-icons">add_box</i></a>
+                <a href="#"><i class="material-icons">timeline</i></a>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      
+
+      <div id="modal1" class="modal">
+        <div class="modal-content">
+          <p><strong>Change Coin</strong></p>
+          
+          <div class="input-field col s12">
+            <select id="myCoin_sel">
+              
+              <option value="BTC">Bitcoin</option>
+              
+              
+            </select>
+            <label>Please select a coin...</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="modal-action modal-close waves-effect waves-orange btn-flat">Continue</a>
+        </div>
+      </div>
+
+      <div id="mod_ChangeFiat" class="modal">
+        <div class="modal-content">
+          <p><strong>Change Currency</strong></p>
+          
+          <div class="input-field col s12">
+            <select id="myCurrency_sel">
+              
+              <option value="USD">US Dollar</option>
+              <option value="AUD">Australian Dollar</option>
+              
+              
+            </select>
+            <label>Please select a coin...</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="modal-action modal-close waves-effect waves-orange btn-flat">Continue</a>
+        </div>
+      </div>
+
+      <div id="mod_CreateTransaction" class="modal">
+        <div class="modal-content">
+          <p><strong>Transaction</strong></p>
+          <div class="input-field col s12">
+            <select id="myTransType_sel">
+              <option value="BUY">Buy</option>
+              <option value="SELL">Sell</option>
+              
+            </select>
+            <label>Transaction Type...</label>
+          </div>
+          <div class="input-field">
+              <input placeholder="Value" id="newTrans_txt" type="number" class="validate">
+              <label for="newTrans_txt">New Transaction</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="modal-action modal-close waves-effect waves-orange btn-flat">Continue</a>
+        </div>
+      </div>
+
+
+      
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    
+    <script type="text/javascript" src="cordova.js"></script>
+    
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/js/materialize.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script>
+
+    <script>
+
+       
+        $(document).ready(function() {
+
+            var myCoin;
+            var myCurrency;
+
+            function getCurrentPrice() {
+                var jsonData = $.ajax({
+                  url: 'https://min-api.cryptocompare.com/data/price?fsym='+myCoin+'&tsyms=BTC,USD,AUD,EUR,NZD',
+                  dataType: 'json',
+                }).done(function (results) {
+                    $('#currentPrice_lbl').html('$' + results[myCurrency].toFixed(4) + ' <small>'+myCurrency+'</small>');
+                    var ThisNewNumbert = results[myCurrency] * $('#currentHoldings_lbl').text();
+                    
+                    $('#currentHoldingsFiat_lbl').text('$' + ThisNewNumbert.toFixed(2) + ' ' + myCurrency);
+                });
+
+                $('#coinPrefix_lbl').text(myCoin);
+            }
+
+            function getAllCoins() {
+                $('#myCoin_sel').empty();
+                var jsonData = $.ajax({
+                  url: 'https://www.cryptocompare.com/api/data/coinlist',
+                  dataType: 'json',
+                }).done(function (results) {
+                    
+                    for(var propName in results['Data']) {
+                        
+                        $('#myCoin_sel').append('<option value="'+propName+'">'+results.Data[propName]['CoinName']+'</option>');
+
+                    }
+
+                    $('#myCoin_sel').material_select();
+
+                });
+            }
+
+            getAllCoins();
+
+            function drawLineChart() {
+
+
+                // Add a helper to format timestamp data
+                Date.prototype.formatMMDDYYYY = function() {
+                    return (this.getMonth() + 1) +
+                    "/" +  this.getDate() +
+                    "/" +  this.getFullYear();
+                }
+
+                var jsonData = $.ajax({
+                  url: 'https://min-api.cryptocompare.com/data/histoday?fsym='+myCoin+'&tsym='+myCurrency+'&limit=30',
+                  dataType: 'json',
+                }).done(function (results) {
+
+                  var labels = [], data=[];
+                  results["Data"].forEach(function(packet) {
+                    labels.push(new Date(packet.time).formatMMDDYYYY());
+                    data.push(parseFloat(packet.high));
+                  });
+
+                  var tempData = {
+                    labels : labels,
+                    datasets : [{
+                        fillColor             : "rgba(255, 156, 24, 0.2)",
+                        borderColor           : "rgba(255, 156, 24, 1)",
+                        backgroundColor       : "rgba(255, 156, 24, 0.4)",
+                        borderWidth           : 1,
+                        data                  : data
+                    }]
+                  };
+
+                  var ctx = document.getElementById("myLineChart");
+
+                  var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: tempData,
+
+                    options: {
+                      legend: 
+                      {
+                        display: false
+                      },
+                      elements: 
+                      {
+                        point:{
+                            radius: 0
+                        },
+                        line: {
+                            tension: 0, // disables bezier curves
+                        },
+                      },
+                      scales:
+                      {
+                          xAxes: [{
+                              display: false
+                          }],
+                          yAxes: [{
+                              display: true
+                          }],
+                            
+                      },
+                    }
+                  });
+
+
+                });
+            }
+
+            if(localStorage.getItem("currentCoin") == null ||  localStorage.getItem("currentCoin") == ''){
+                localStorage.setItem("currentCoin", "BTC");
+                myCoin = 'BTC';
+                localStorage.setItem("BTC_Holdings", "0.00000000");
+                
+            } else {
+                
+                myCoin = localStorage.getItem("currentCoin");
+                getBalance = myCoin + '_Holdings';
+                myCurrentBal = localStorage.getItem(getBalance);
+                if(myCurrentBal == null ){
+                    $('#currentHoldings_lbl').text('0.00000000');
+                } else {
+                    $('#currentHoldings_lbl').text(parseFloat(myCurrentBal).toFixed(8));
+                }
+                
+
+            }
+
+            if(localStorage.getItem("currentFiat") == null ||  localStorage.getItem("currentFiat") == ''){
+                localStorage.setItem("currentFiat", "AUD");
+                myCurrency = 'AUD';
+            } else {
+                myCurrency = localStorage.getItem("currentFiat");
+            }
+
+            //localStorage.setItem("currentFiat", myCurr);
+            getCurrentPrice();
+            drawLineChart();
+
+            // Element initialization
+            $(".button-collapse").sideNav();
+            $('select').material_select();
+
+            $('select').on('contentChanged', function() {
+              $(this).material_select();
+            });
+
+            $('#modal1').modal({
+              dismissible: true, // Modal can be dismissed by clicking outside of the modal
+              opacity: .5, // Opacity of modal background
+              inDuration: 300, // Transition in duration
+              outDuration: 200, // Transition out duration
+              startingTop: '4%', // Starting top style attribute
+              endingTop: '10%', // Ending top style attribute
+              ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                //alert("Ready");
+                console.log(modal, trigger);
+              },
+              complete: function() { 
+                myCoin = $('#myCoin_sel').val();
+                localStorage.setItem("currentCoin", myCoin);
+                
+                location.reload();
+              } 
+            });
+
+            $('#mod_ChangeFiat').modal({
+              dismissible: true, // Modal can be dismissed by clicking outside of the modal
+              opacity: .5, // Opacity of modal background
+              inDuration: 300, // Transition in duration
+              outDuration: 200, // Transition out duration
+              startingTop: '4%', // Starting top style attribute
+              endingTop: '10%', // Ending top style attribute
+              ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                //alert("Ready");
+                console.log(modal, trigger);
+              },
+              complete: function() { 
+                myCurr = $('#myCurrency_sel').val();
+                localStorage.setItem("currentFiat", myCurr);
+                
+                location.reload();
+              } 
+            });
+
+            $('#mod_CreateTransaction').modal({
+              dismissible: true, // Modal can be dismissed by clicking outside of the modal
+              opacity: .5, // Opacity of modal background
+              inDuration: 300, // Transition in duration
+              outDuration: 200, // Transition out duration
+              startingTop: '4%', // Starting top style attribute
+              endingTop: '10%', // Ending top style attribute
+              ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+                //alert("Ready");
+                console.log(modal, trigger);
+              },
+              complete: function() { 
+                myCoin2 = localStorage.getItem("currentCoin");
+                getBalance2 = myCoin2 + '_Holdings';
+                myCurrentBal2 = localStorage.setItem(getBalance2, $('#newTrans_txt').val());
+
+                location.reload();
+              } 
+            });
+
+        });
+
+        
+  </script>
+
+  </body>
+</html>
