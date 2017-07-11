@@ -7,9 +7,13 @@
 
    <!-- Compiled and minified CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 
     <style type="text/css">
-      
+      * {
+        font-family: 'Muli', sans-serif;
+
+      }
     </style>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -53,10 +57,17 @@
           <div class="card ">
             <div class="card-content ">
               
-                <p><small>Current Price (<span id="coinPrefix_lbl"></span>)</small></p>
+                <p><small><strong>Current Price</strong> (<span id="coinPrefix_lbl"></span>)</small></p>
                 <h5 id="currentPrice_lbl"></h5>
 
                 <p class=""><small id="marketData_lbl" hidden>Checking for market data...</small></p>
+
+                <small id="currentPriceBTC_lbl"></small>
+                <br/><br/>
+                <div>
+                    <canvas id="myLineChart"></canvas>
+
+                </div>
             </div>
             <!--
             <div class="card-action grey darken-2 white-text">
@@ -73,30 +84,18 @@
       <div class="row">
         <div class="col s12 m12">
           <div class="card ">
-            <div class="card-content  white-text">
-              <canvas id="myLineChart"></canvas>
-
-              
-            </div>
-            
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col s12 m12">
-          <div class="card ">
             <div class="card-content ">
               
-              <p><small>Current Holdings</small></p>
-              <h5 id="currentHoldings_lbl">0.0000000</h5>
-              <small id="currentHoldingsFiat_lbl">$0.00</small>
+              <p><small><strong>Current Balance</strong></small><span class="right"><strong><small class="right" id="currentHoldingsFiat_lbl">$0.00</small><br/><small class="right" id="convertedToBTC"></small></strong></span></p>
               
+              <h5 id="currentHoldings_lbl">0.0000000</h5>
+              <br/>
+              <p>Bittrex: <span id="bittrexAPI_stat1"><small>NOT ENABLED</small></span></p>
             </div>
             <div class="card-action grey darken-2 white-text">
             
                 <a href="#mod_CreateTransaction"><i class="material-icons">add_box</i></a>
-                <a href="#"><i class="material-icons">shopping_cart</i></a>
+                <a href="https://www.coinbase.com/join/5607ab0eb750bc2a24000295" target="_blank"><i class="material-icons">shopping_cart</i></a>
                 
                 <a href="#"><i class="material-icons">timeline</i></a>
 
@@ -169,6 +168,7 @@
             </div>
         </div>
         <div class="modal-footer">
+            <a href="#!" onclick="location.reload();" class="waves-effect waves-orange btn-flat">Cancel</a>
           <a href="#!" class="modal-action modal-close waves-effect waves-orange btn-flat">Continue</a>
         </div>
       </div>
@@ -188,26 +188,41 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script>
 
     <script>
+        
+        document.addEventListener("deviceready", onDeviceReady, false);
 
-       
-        $(document).ready(function() {
+        function onDeviceReady() {
+            
+            try {
+                cordova.plugins.backgroundMode.enable();
+            } catch(err){
+                console.log('Cannot work in BG');
+            }
 
             var myCoin;
             var myCurrency;
 
+            //alert(cordova.plugins.backgroundMode.isActive());
             function getCurrentPrice() {
                 var jsonData = $.ajax({
                   url: 'https://min-api.cryptocompare.com/data/price?fsym='+myCoin+'&tsyms=BTC,USD,AUD,EUR,NZD',
                   //url: 'https://www.cryptocompare.com/api/data/coinsnapshot/?fsym='+myCoin+'&tsym=USD',
                   dataType: 'json',
                 }).done(function (results) {
-                    //console.log(results);
+                    console.log(results['BTC']);
                     $('#marketData_lbl').show();
-                    $('#currentPrice_lbl').html('$' + results[myCurrency].toFixed(4) + ' <small>'+myCurrency+'</small>');
+                    $('#currentPrice_lbl').html('$' + results[myCurrency].toFixed(2) + ' <small>'+myCurrency+'</small>');
                     var ThisNewNumbert = results[myCurrency] * $('#currentHoldings_lbl').text();
                     
                     $('#currentHoldingsFiat_lbl').text('$' + ThisNewNumbert.toFixed(2) + ' ' + myCurrency);
-                    
+                    $('#currentPriceBTC_lbl').text(parseFloat(results['BTC']).toFixed(8) + ' BTC');
+                    //currentPriceBTC_lbl
+                    var BTCPRICE = parseFloat($('#currentPriceBTC_lbl').text());
+                    //alert(parseFloat(BTCPRICE).toFixed(8));
+                    var HOLDINGPRICE = parseFloat($('#currentHoldings_lbl').text());
+                    var CONVERT = HOLDINGPRICE * BTCPRICE;
+                    //alert(CONVERT);
+                    $('#convertedToBTC').text(parseFloat(CONVERT).toFixed(8) + ' BTC');
                 });
 
                 var jsonData1a = $.ajax({
@@ -216,14 +231,22 @@
                 }).done(function (results2) {
                     
                     if (results2.Message == 'Coin snapshot succesfully returned'){
-                        $('#marketData_lbl').text("24Hr High: $" + parseFloat( results2.Data.Exchanges[0].HIGH24HOUR).toFixed(2) + "USD -  24Hr Low: $" + parseFloat( results2.Data.Exchanges[0].LOW24HOUR).toFixed(2) + "USD ("+results2.Data.Exchanges[0].MARKET+")" );
+                        $('#marketData_lbl').html("");
+                        //$('#marketData_lbl').text("24Hr High: $" + parseFloat( results2.Data.Exchanges[0].HIGH24HOUR).toFixed(2) + "USD -  24Hr Low: $" + parseFloat( results2.Data.Exchanges[0].LOW24HOUR).toFixed(2) + "USD ("+results2.Data.Exchanges[0].MARKET+")" );
                     } else {
-                        $('#marketData_lbl').html("<strong>ERROR: </strong>" + results2.Message + "!");
+                        //$('#marketData_lbl').html("<strong>ERROR: </strong>" + results2.Message + "!");
+                        $('#marketData_lbl').html("");
                     }
+
+                    
+
                 });
 
 
                 $('#coinPrefix_lbl').text(myCoin);
+
+                //currentPriceBTC_lbl / currentHoldings_lbl
+
             }
 
             function getAllCoins() {
@@ -256,8 +279,6 @@
                         },
                         minLength: 2, // The minimum length of the input for the autocomplete to start. Default: 1.
                       });
-
-                    //$('#myCoin_sel').material_select();
 
                 });
             }
@@ -301,6 +322,7 @@
                     data: tempData,
 
                     options: {
+                        animation: false,
                       legend: 
                       {
                         display: false
@@ -357,7 +379,6 @@
                 myCurrency = localStorage.getItem("currentFiat");
             }
 
-            //localStorage.setItem("currentFiat", myCurr);
             getCurrentPrice();
             drawLineChart();
 
@@ -421,18 +442,36 @@
                 console.log(modal, trigger);
               },
               complete: function() { 
-                myCoin2 = localStorage.getItem("currentCoin");
-                getBalance2 = myCoin2 + '_Holdings';
-                myCurrentBal2 = localStorage.setItem(getBalance2, $('#newTrans_txt').val());
-
-                location.reload();
-              } 
+                if($('#newTrans_txt').val() == ''){
+                    location.reload();
+                } else {
+                    myCoin2 = localStorage.getItem("currentCoin");
+                    getBalance2 = myCoin2 + '_Holdings';
+                    myCurrentBal2 = localStorage.setItem(getBalance2, $('#newTrans_txt').val());
+                    location.reload();
+                }
+                
+              } ,
+              cancel: function() {
+                alert('asdfasdf');
+              }
             });
 
             window.setInterval(function(){
                 getCurrentPrice();
-                //drawLineChart();
+                drawLineChart();
             }, 30000);
+
+        }
+
+
+
+       
+        $(document).ready(function() {
+
+            //cordova.plugins.backgroundMode.enable();
+            
+            
 
         });
         
